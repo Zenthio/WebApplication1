@@ -3,7 +3,7 @@ name: Deploy ASP.NET Core app to Azure Web App
 on:
   push:
     branches:
-      - master  # Reemplaza 'main' con la rama que quieras usar
+      - master
 
 jobs:
   build-and-deploy:
@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '8.0.x'  # Reemplaza con la versión de .NET que estás usando
+        dotnet-version: '8.0.x'
 
     - name: Restore dependencies
       run: dotnet restore
@@ -30,6 +30,6 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: apikey-rotation-mvp-backend  # Reemplaza con el nombre de tu App Service
+        app-name: apikey-rotation-mvp-backend
         slot-name: 'production'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
