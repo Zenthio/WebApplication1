@@ -1,6 +1,6 @@
-﻿using Azure.Security.KeyVault.Secrets;
-using Azure.Identity;
-using System;
+﻿using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Configuration;
 using System.Timers;
 
 namespace WebApplication1.Services
@@ -8,13 +8,19 @@ namespace WebApplication1.Services
     public class ApiKeyService
     {
         private string _currentApiKey;
-        private readonly SecretClient _secretClient;
         private System.Timers.Timer _timer;
+        private readonly SecretClient _secretClient;
+        private readonly string _secretName = "ApiKey"; // El nombre del secreto en Key Vault
 
         public ApiKeyService(IConfiguration configuration)
         {
-            _secretClient = new SecretClient(new Uri(configuration["KeyVault:Url"]), new DefaultAzureCredential());
-            _currentApiKey = GetApiKeyFromVault().Result;
+            var keyVaultEndpoint = configuration["KeyVault:Endpoint"];
+            if (string.IsNullOrEmpty(keyVaultEndpoint))
+            {
+                throw new ArgumentNullException(nameof(keyVaultEndpoint), "The Key Vault endpoint is not configured.");
+            }
+            _secretClient = new SecretClient(new Uri(keyVaultEndpoint), new DefaultAzureCredential());
+            _currentApiKey = GetSecretValue();
             _timer = new System.Timers.Timer(3600000); // Rotate API key every hour (3600000 milliseconds)
             _timer.Elapsed += RotateApiKey;
             _timer.Start();
@@ -25,22 +31,24 @@ namespace WebApplication1.Services
             return _currentApiKey;
         }
 
-        private async void RotateApiKey(object sender, ElapsedEventArgs e)
+        private void RotateApiKey(object sender, ElapsedEventArgs e)
         {
-            _currentApiKey = GenerateApiKey();
-            await _secretClient.SetSecretAsync(new KeyVaultSecret("ApiKey", _currentApiKey));
+            _currentApiKey = GetSecretValue();
             Console.WriteLine($"API Key rotated to: {_currentApiKey}");
         }
 
-        private string GenerateApiKey()
+        private string GetSecretValue()
         {
-            return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-        }
-
-        private async Task<string> GetApiKeyFromVault()
-        {
-            var secret = await _secretClient.GetSecretAsync("ApiKey");
-            return secret.Value.Value;
+            try
+            {
+                KeyVaultSecret secret = _secretClient.GetSecret(_secretName);
+                return secret.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving secret from Key Vault: {ex.Message}");
+                throw;
+            }
         }
     }
 }

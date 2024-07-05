@@ -1,4 +1,3 @@
-
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -8,34 +7,34 @@ using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Agregar Azure Key Vault a la configuración
+var keyVaultEndpoint = builder.Configuration["KeyVault:Endpoint"];
+if (string.IsNullOrEmpty(keyVaultEndpoint))
+{
+    throw new InvalidOperationException("The Key Vault endpoint is not configured.");
+}
+builder.Configuration.AddAzureKeyVault(new Uri(keyVaultEndpoint), new DefaultAzureCredential());
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-//builder.Logging.AddAzureWebAppDiagnostics();
-
-var keyVaultEndpoint = new Uri("https://apikeyrotation-keyvault.vault.azure.net/");
-builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
-
-// Add services to the container.
+// Resto de la configuración
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure CORS
+// Configuración de CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("https://proud-pebble-0419a7e0f.5.azurestaticapps.net") // React development server
+        builder.WithOrigins("https://proud-pebble-0419a7e0f.5.azurestaticapps.net") // Servidor de desarrollo de React
                .AllowAnyHeader()
                .AllowAnyMethod();
     });
 });
 
-// Register ApiKeyService
+// Registro de ApiKeyService
 builder.Services.AddSingleton<ApiKeyService>();
 
-// Configure JWT authentication
+// Configuración de autenticación JWT
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(options =>
 {
@@ -52,16 +51,16 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ClockSkew = TimeSpan.Zero // Minimize clock skew to prevent replay attacks
+        ClockSkew = TimeSpan.Zero // Minimizar el desfase del reloj para prevenir ataques de repetición
     };
 });
 
-// Register ApiKeyAuthFilter
+// Registro del filtro de autenticación de la API Key
 builder.Services.AddScoped<ApiKeyAuthFilter>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configurar el pipeline de la solicitud HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -69,12 +68,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors(); // Enable CORS
-app.UseMiddleware<WebApplication1.Middleware.RateLimitingMiddleware>(); // Register custom rate limiting middleware
+app.UseCors(); // Habilitar CORS
+app.UseMiddleware<WebApplication1.Middleware.RateLimitingMiddleware>(); // Registrar middleware de limitación de tasa
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-
