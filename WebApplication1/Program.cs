@@ -1,3 +1,5 @@
+
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -11,6 +13,8 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 //builder.Logging.AddAzureWebAppDiagnostics();
 
+var keyVaultEndpoint = new Uri("https://apikeyrotation-keyvault.vault.azure.net/");
+builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 
 // Add services to the container.
 builder.Services.AddControllers();
