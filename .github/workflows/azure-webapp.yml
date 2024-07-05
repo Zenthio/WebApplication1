@@ -17,6 +17,9 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v2
 
+    - name: Install apt-utils
+      run: sudo apt-get update && sudo apt-get install -y apt-utils
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -34,7 +37,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: '20.10.0'
+        node-version: '18'
 
     - name: Build frontend app
       run: |
