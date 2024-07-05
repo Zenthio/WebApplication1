@@ -44,7 +44,6 @@ jobs:
         cd web-application1-front
         npm install
         npm run build
-        serve -s build
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
