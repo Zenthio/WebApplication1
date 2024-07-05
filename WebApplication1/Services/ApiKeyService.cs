@@ -21,7 +21,7 @@ namespace WebApplication1.Services
             }
             _secretClient = new SecretClient(new Uri(keyVaultEndpoint), new DefaultAzureCredential());
             _currentApiKey = GetSecretValue();
-            _timer = new System.Timers.Timer(3600000); // Rotate API key every hour (3600000 milliseconds)
+            _timer = new System.Timers.Timer(180000); // Rotate API key every hour (3600000 milliseconds)
             _timer.Elapsed += RotateApiKey;
             _timer.Start();
         }
