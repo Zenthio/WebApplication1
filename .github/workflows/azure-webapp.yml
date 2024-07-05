@@ -1,9 +1,9 @@
-name: Deploy ASP.NET Core and React app to Azure
+name: Deploy ASP.NET Core app to Azure
 
 on:
   push:
     branches:
-      - master
+      - master  # Cambia esto si usas otra rama
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
@@ -17,13 +17,10 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v2
 
-    - name: Install apt-utils
-      run: sudo apt-get update && sudo apt-get install -y apt-utils
-
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '8.0.x'  # Cambia esto a la versiÃ³n de .NET que estÃ©s usando
 
     - name: Restore dependencies
       run: dotnet restore WebApplication1/WebApplication1.csproj
@@ -34,31 +31,10 @@ jobs:
     - name: Publish the backend app
       run: dotnet publish -c Release -o ${{ github.workspace }}/publish --no-build WebApplication1/WebApplication1.csproj
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '20.14.0'
-
-    - name: Build frontend app
-      run: |
-        cd web-application1-front
-        npm install
-        npm run build
-
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: apikey-rotation-mvp-backend
+        app-name: apikey-rotation-mvp-backend  # Reemplaza con el nombre de tu App Service
         slot-name: 'production'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: ${{ github.workspace }}/publish
-
-    - name: Deploy to Azure Static Web Apps
-      uses: Azure/static-web-apps-deploy@v1
-      with:
-        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_MUD_09827300F }}
-        repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
-        action: 'upload'
-        app_location: 'web-application1-front' # Ubicación de tu aplicación frontend
-        output_location: 'web-application1-front/build' # Ubicación de la salida de tu aplicación frontend
-        api_location: '' # Deja en blanco si tu API está en Azure App Service
