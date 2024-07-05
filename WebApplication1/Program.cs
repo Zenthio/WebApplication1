@@ -6,6 +6,12 @@ using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+//builder.Logging.AddAzureWebAppDiagnostics();
+
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -16,7 +22,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://localhost:3000") // React development server
+        builder.WithOrigins("https://proud-pebble-0419a7e0f.5.azurestaticapps.net") // React development server
                .AllowAnyHeader()
                .AllowAnyMethod();
     });
@@ -24,9 +30,6 @@ builder.Services.AddCors(options =>
 
 // Register ApiKeyService
 builder.Services.AddSingleton<ApiKeyService>();
-
-//Register the ApiKeyAuthFilter
-builder.Services.AddScoped<ApiKeyAuthFilter>();
 
 // Configure JWT authentication
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
@@ -70,3 +73,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
