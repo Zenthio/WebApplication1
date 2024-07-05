@@ -1,0 +1,106 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+.App {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.App-header {
+    background-color: #282c34;
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+    color: white;
+}
+
+    .App-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+    }
+
+.App-main {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+.data-section {
+    background-color: white;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+    .data-section h2 {
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+    }
+
+.weather-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.forecast {
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    width: calc(33.333% - 20px);
+    box-sizing: border-box;
+}
+
+    .forecast p {
+        margin: 5px 0;
+    }
+
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+/* Dark Mode Styles */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+
+    .App-header {
+        background-color: #1f1f1f;
+    }
+
+    .data-section {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+    }
+
+    .forecast {
+        background-color: #2c2c2c;
+        color: #e0e0e0;
+    }
+
+    .error {
+        color: #ff6b6b;
+    }
+}

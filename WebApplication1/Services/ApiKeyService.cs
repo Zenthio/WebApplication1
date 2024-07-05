@@ -1,16 +1,19 @@
 ﻿using System;
+using System.Timers;
 
 namespace WebApplication1.Services
 {
     public class ApiKeyService
     {
-        private readonly IConfiguration _configuration;
         private string _currentApiKey;
+        private System.Timers.Timer _timer;
 
-        public ApiKeyService(IConfiguration configuration)
+        public ApiKeyService()
         {
-            _configuration = configuration;
             _currentApiKey = GenerateApiKey();
+            _timer = new System.Timers.Timer(3600000); // Rotate API key every hour (3600000 milliseconds)
+            _timer.Elapsed += RotateApiKey;
+            _timer.Start();
         }
 
         public string GetCurrentApiKey()
@@ -18,9 +21,10 @@ namespace WebApplication1.Services
             return _currentApiKey;
         }
 
-        public void RotateApiKey()
+        private void RotateApiKey(object sender, ElapsedEventArgs e)
         {
             _currentApiKey = GenerateApiKey();
+            Console.WriteLine($"API Key rotated to: {_currentApiKey}");
         }
 
         private string GenerateApiKey()

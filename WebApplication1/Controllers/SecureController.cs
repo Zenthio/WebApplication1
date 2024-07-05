@@ -1,24 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Filters;
-using WebApplication1.Services;
+using Microsoft.Extensions.Logging;
 
 namespace WebApplication1.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class SecureController : ControllerBase
+    public class SecureController(ILogger<SecureController> logger) : ControllerBase
     {
-        private readonly ApiKeyService _apiKeyService;
-
-        public SecureController(ApiKeyService apiKeyService)
-        {
-            _apiKeyService = apiKeyService;
-        }
+        private readonly ILogger<SecureController> _logger = logger;
 
         [HttpGet]
-        [ServiceFilter(typeof(ApiKeyAuthFilter))]
-        public IActionResult Get()
+        public IActionResult GetSecureData()
         {
+            _logger.LogInformation("Secure endpoint requested.");
             return Ok("Secure data");
         }
     }
