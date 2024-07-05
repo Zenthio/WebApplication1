@@ -23,13 +23,13 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore src/WebApplication1/WebApplication1.csproj
+      run: dotnet restore WebApplication1/WebApplication1.csproj
 
     - name: Build the backend app
-      run: dotnet build --configuration Release --no-restore src/WebApplication1/WebApplication1.csproj
+      run: dotnet build --configuration Release --no-restore WebApplication1/WebApplication1.csproj
 
     - name: Publish the backend app
-      run: dotnet publish -c Release -o ${{ github.workspace }}/publish --no-build src/WebApplication1/WebApplication1.csproj
+      run: dotnet publish -c Release -o ${{ github.workspace }}/publish --no-build WebApplication1/WebApplication1.csproj
 
     - name: Setup Node.js
       uses: actions/setup-node@v1
@@ -38,14 +38,14 @@ jobs:
 
     - name: Build frontend app
       run: |
-        cd src/web-application1-front
+        cd web-application1-front
         npm install
         npm run build
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: apikey-rotation-mvp-backend  # Reemplaza con el nombre de tu App Service
+        app-name: apikey-rotation-mvp-backend
         slot-name: 'production'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: ${{ github.workspace }}/publish
@@ -56,6 +56,6 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_API_KEY_ROTATION_MVP_FRONTEND }}
         repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
         action: 'upload'
-        app_location: 'src/web-application1-front' # Ubicación de tu aplicación frontend
-        output_location: 'src/web-application1-front/build' # Ubicación de la salida de tu aplicación frontend
+        app_location: 'web-application1-front' # Ubicación de tu aplicación frontend
+        output_location: 'web-application1-front/build' # Ubicación de la salida de tu aplicación frontend
         api_location: '' # Deja en blanco si tu API está en Azure App Service
