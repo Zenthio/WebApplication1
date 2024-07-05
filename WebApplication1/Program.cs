@@ -15,14 +15,22 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000") // React development server
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
+
 //Register the ApiKeyService
 builder.Services.AddSingleton<ApiKeyService>();
 
-//Register the ApiKeyAuthFilter
-builder.Services.AddScoped<ApiKeyAuthFilter>();
-
 // Configure JWT authentication
-var key = Encoding.ASCII.GetBytes("this is my custom Secret key for authnetication");
+var key = Encoding.ASCII.GetBytes("E8f1s$kL@9f#N0uV3p&j%tX2wZ8yH6qJ3u7yB8a6f5G4D1");
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,11 +43,16 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "your_issuer",
-        ValidAudience = "your_audience",
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
+
+
+//Register the ApiKeyAuthFilter
+builder.Services.AddScoped<ApiKeyAuthFilter>();
+
 
 var app = builder.Build();
 
@@ -49,10 +62,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
-
+else
+{
+    app.UseHttpsRedirection();
+    app.UseHsts();
+}
+app.UseCors();
 app.UseAuthorization();
 
 app.MapControllers();

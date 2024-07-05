@@ -22,4 +22,5 @@ namespace WebApplication1.Controllers
             return Ok("Secure data");
         }
     }
+
 }
