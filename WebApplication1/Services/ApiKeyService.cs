@@ -25,7 +25,7 @@ namespace WebApplication1.Services
             _secretClient = new SecretClient(new Uri(keyVaultEndpoint), new DefaultAzureCredential());
             _logger = logger;
             _currentApiKey = GetSecretValue();
-            _timer = new System.Timers.Timer(180000); // 3 minutos
+            _timer = new System.Timers.Timer(3600000); // 1 hora
             _timer.Elapsed += RotateApiKey;
             _timer.Start();
             
