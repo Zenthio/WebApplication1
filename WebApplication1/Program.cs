@@ -57,7 +57,12 @@ builder.Services.AddAuthentication(options =>
 
 // Registro del filtro de autenticación de la API Key
 builder.Services.AddScoped<ApiKeyAuthFilter>();
-
+builder.Services.AddLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+    logging.AddAzureWebAppDiagnostics();
+});
 var app = builder.Build();
 
 // Configurar el pipeline de la solicitud HTTP
